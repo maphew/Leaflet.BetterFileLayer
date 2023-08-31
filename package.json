@@ -41,14 +41,14 @@
   },
   "homepage": "https://github.com/gabriel-russo/Leaflet.BetterFileLayer",
   "dependencies": {
-    "brfs": "^1.4.3",
-    "corslite": "^0.0.7",
-    "csv2geojson": "~5.0.0",
+    "@mapbox/corslite": "^0.0.7",
+    "@mapbox/polyline": "^0.2.0",
+    "@mapbox/togeojson": "^0.16.0",
+    "brfs": "^2.0.2",
+    "csv2geojson": "^5.1.2",
     "leaflet": "^1.9.4",
-    "polyline": "^0.2.0",
-    "togeojson": "^0.13.0",
-    "topojson": "^1.6.26",
-    "wellknown": "^0.4.2"
+    "topojson-client": "^3.1.0",
+    "wellknown": "^0.5.0"
   },
   "devDependencies": {
     "css-loader": "^6.8.1",

@@ -1,31 +1,92 @@
 import * as L from "leaflet";
+import "./leaflet.betterfilelayer.css";
+import { geojsonLoad, kmlLoad } from "./leaflet.omnivore";
 
 L.Control.BetterFileLayer = L.Control.extend({
-   options: {
-
-   },
-
-    initialize(options){
-
+  options: {
+    position: 'topleft',
+    text: {
+      title: "Import a layer",
     },
+  },
 
-    onAdd(){
+  initialize(options) {
+    L.setOptions(this, options);
+  },
 
-    },
+  onAdd() {
+    const container = L.DomUtil.create("div", "leaflet-control");
+    const inputContainer = L.DomUtil.create("div", "leaflet-control-better-filelayer", container);
+    const input = L.DomUtil.create("input", "", inputContainer);
 
-    onRemove(){
+    input.title = this.options.text.title;
+    input.type = "file";
+    input.multiple = true;
 
+    if (this.options.formats) {
+      input.accept = this.options.formats.join(',');
+    } else {
+      input.accept = '.gpx,.kml,.geojson,.json,.txt,.csv,.topojson,.wkt';
     }
+
+    L.DomEvent.addListener(input, "change", this._load, this);
+
+    const mapContainer = this._map.getContainer();
+    L.DomEvent.addListener(mapContainer, "dragover", L.DomEvent.stopPropagation)
+      .addListener(mapContainer, "dragover", L.DomEvent.preventDefault)
+      .addListener(mapContainer, "drop", L.DomEvent.stopPropagation)
+      .addListener(mapContainer, "drop", L.DomEvent.preventDefault)
+      .addListener(mapContainer, "drop", this._load, this);
+
+    return container;
+  },
+
+  _load(e) {
+    const fileLoaders = {
+      "application/geo+json": geojsonLoad,
+      "application/json": geojsonLoad,
+      "application/vnd.google-earth.kml+xml": kmlLoad,
+    };
+
+    let files;
+    switch (e.type) {
+      case "drop":
+        files = e.dataTransfer.files;
+        break;
+      case "change":
+        files = e.target.files;
+        break;
+      default:
+        files = undefined;
+        break;
+    }
+
+    for (const file of files) {
+      const callback = fileLoaders[file.type] || undefined;
+
+      if (!callback) {
+        return;
+      }
+
+      const layer = callback(URL.createObjectURL(file));
+
+      this._map.addLayer(layer);
+    }
+  },
+
+  onRemove() {
+  },
 });
 
 L.Map.mergeOptions({
-    betterFileLayerControl: false,
-})
+  betterFileLayerControl: false,
+});
 
 L.Map.addInitHook(function () {
-    if (this.options.betterFileLayerControl) {
-        L.Control.betterFileLayer().addTo(this);
-    }
-})
+  if (this.options.betterFileLayerControl) {
+    L.Control.betterFileLayer()
+      .addTo(this);
+  }
+});
 
 L.Control.betterFileLayer = (options) => new L.Control.BetterFileLayer(options);
