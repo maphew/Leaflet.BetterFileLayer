@@ -1,37 +1,7 @@
-var xhr = require('corslite'),
-    csv2geojson = require('csv2geojson'),
-    wellknown = require('wellknown'),
-    polyline = require('polyline'),
-    topojson = require('topojson'),
-    toGeoJSON = require('togeojson');
-
-module.exports.polyline = polylineLoad;
-module.exports.polyline.parse = polylineParse;
-
-module.exports.geojson = geojsonLoad;
-
-module.exports.topojson = topojsonLoad;
-module.exports.topojson.parse = topojsonParse;
-
-module.exports.csv = csvLoad;
-module.exports.csv.parse = csvParse;
-
-module.exports.gpx = gpxLoad;
-module.exports.gpx.parse = gpxParse;
-
-module.exports.kml = kmlLoad;
-module.exports.kml.parse = kmlParse;
-
-module.exports.wkt = wktLoad;
-module.exports.wkt.parse = wktParse;
-
-function addData(l, d) {
-    if ('setGeoJSON' in l) {
-        l.setGeoJSON(d);
-    } else if ('addData' in l) {
-        l.addData(d);
-    }
-}
+import * as L from "leaflet";
+import * as xhr from "corslite";
+import {addData} from "./leaflet.omnivore.utils";
+import {topojsonParse, csvParse, wktParse, kmlParse, polylineParse, gpxParse} from "./leaflet.omnivore.parsers";
 
 /**
  * Load a [GeoJSON](http://geojson.org/) document into a layer and return the layer.
@@ -181,78 +151,4 @@ function polylineLoad(url, options, customLayer) {
         layer.fire('ready');
     }
     return layer;
-}
-
-function topojsonParse(data, options, layer) {
-    var o = typeof data === 'string' ?
-        JSON.parse(data) : data;
-    layer = layer || L.geoJson();
-    for (var i in o.objects) {
-        var ft = topojson.feature(o, o.objects[i]);
-        if (ft.features) addData(layer, ft.features);
-        else addData(layer, ft);
-    }
-    return layer;
-}
-
-function csvParse(csv, options, layer) {
-    layer = layer || L.geoJson();
-    options = options || {};
-    csv2geojson.csv2geojson(csv, options, onparse);
-    function onparse(err, geojson) {
-        if (err) return layer.fire('error', { error: err });
-        addData(layer, geojson);
-    }
-    return layer;
-}
-
-function gpxParse(gpx, options, layer) {
-    var xml = parseXML(gpx);
-    if (!xml) return layer.fire('error', {
-        error: 'Could not parse GPX'
-    });
-    layer = layer || L.geoJson();
-    var geojson = toGeoJSON.gpx(xml);
-    addData(layer, geojson);
-    return layer;
-}
-
-
-function kmlParse(gpx, options, layer) {
-    var xml = parseXML(gpx);
-    if (!xml) return layer.fire('error', {
-        error: 'Could not parse KML'
-    });
-    layer = layer || L.geoJson();
-    var geojson = toGeoJSON.kml(xml);
-    addData(layer, geojson);
-    return layer;
-}
-
-function polylineParse(txt, options, layer) {
-    layer = layer || L.geoJson();
-    options = options || {};
-    var coords = polyline.decode(txt, options.precision);
-    var geojson = { type: 'LineString', coordinates: [] };
-    for (var i = 0; i < coords.length; i++) {
-        // polyline returns coords in lat, lng order, so flip for geojson
-        geojson.coordinates[i] = [coords[i][1], coords[i][0]];
-    }
-    addData(layer, geojson);
-    return layer;
-}
-
-function wktParse(wkt, options, layer) {
-    layer = layer || L.geoJson();
-    var geojson = wellknown(wkt);
-    addData(layer, geojson);
-    return layer;
-}
-
-function parseXML(str) {
-    if (typeof str === 'string') {
-        return (new DOMParser()).parseFromString(str, 'text/xml');
-    } else {
-        return str;
-    }
 }

@@ -1,2 +1,3 @@
-leaflet-omnivore.js
-leaflet-omnivore.min.js
+dist
+node_modules
+.idea
