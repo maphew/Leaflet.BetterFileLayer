@@ -1,10 +1,19 @@
 import * as L from "leaflet";
 import "./leaflet.betterfilelayer.css";
-import { geojsonLoad, kmlLoad } from "./leaflet.omnivore";
+import {
+  csvLoad, geojsonLoad, gpxLoad, kmlLoad, topojsonLoad, wktLoad,
+} from "./leaflet.omnivore";
 
 L.Control.BetterFileLayer = L.Control.extend({
   options: {
     position: 'topleft',
+    importOptions: {
+      "text/csv": {
+        delimiter: ';',
+        latfield: 'LAT',
+        lonfield: 'LONG',
+      },
+    },
     text: {
       title: "Import a layer",
     },
@@ -32,6 +41,7 @@ L.Control.BetterFileLayer = L.Control.extend({
     L.DomEvent.addListener(input, "change", this._load, this);
 
     const mapContainer = this._map.getContainer();
+
     L.DomEvent.addListener(mapContainer, "dragover", L.DomEvent.stopPropagation)
       .addListener(mapContainer, "dragover", L.DomEvent.preventDefault)
       .addListener(mapContainer, "drop", L.DomEvent.stopPropagation)
@@ -43,9 +53,13 @@ L.Control.BetterFileLayer = L.Control.extend({
 
   _load(e) {
     const fileLoaders = {
-      "application/geo+json": geojsonLoad,
-      "application/json": geojsonLoad,
-      "application/vnd.google-earth.kml+xml": kmlLoad,
+      geojson: geojsonLoad,
+      json: geojsonLoad,
+      kml: kmlLoad,
+      csv: csvLoad,
+      wkt: wktLoad,
+      gpx: gpxLoad,
+      topojson: topojsonLoad,
     };
 
     let files;
@@ -62,15 +76,26 @@ L.Control.BetterFileLayer = L.Control.extend({
     }
 
     for (const file of files) {
-      const callback = fileLoaders[file.type] || undefined;
+      const fileExtension = file.name.toLowerCase().split('.').at(-1);
 
-      if (!callback) {
+      const loader = fileLoaders[fileExtension] || undefined;
+
+      const loaderOption = this.options.importOptions[file.type] || {};
+
+      if (!loader) {
         return;
       }
 
-      const layer = callback(URL.createObjectURL(file));
+      loader(URL.createObjectURL(file), loaderOption)
+        .then((layer) => {
+          const addedLayer = this._map.addLayer(layer);
 
-      this._map.addLayer(layer);
+          this._map.fitBounds(layer.getBounds());
+
+          this._map.fire("bfl:layerloaded", { layer: addedLayer }, this);
+        }).catch((error) => {
+          this._map.fire("bfl:error", error);
+        });
     }
   },
 

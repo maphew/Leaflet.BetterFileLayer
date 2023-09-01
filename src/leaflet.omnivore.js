@@ -1,6 +1,5 @@
 import * as L from "leaflet";
-import * as xhr from "@mapbox/corslite";
-import { addData } from "./leaflet.omnivore.utils";
+import { readFileData } from "./leaflet.omnivore.utils";
 import {
   topojsonParse, csvParse, wktParse, kmlParse, polylineParse, gpxParse,
 } from "./leaflet.omnivore.parsers";
@@ -11,16 +10,19 @@ import {
  * @param {string} url
  * @param {object} options
  * @param {object} customLayer
- * @returns {object}
+ * @returns {Promise<Object>}
  */
-export function geojsonLoad(url, options, customLayer) {
+export async function geojsonLoad(url, options, customLayer) {
   let layer = customLayer || L.geoJson();
-  xhr(url, (err, response) => {
-    if (err) return layer.fire('error', { error: err });
-    addData(layer, JSON.parse(response.responseText));
-    layer.fire('ready');
-  });
-  return layer;
+
+  const data = await readFileData(url);
+
+  try {
+    layer.addData(JSON.parse(data));
+    return layer;
+  } catch (err) {
+    throw Error("GeoJSON not valid");
+  }
 }
 
 /**
@@ -29,19 +31,21 @@ export function geojsonLoad(url, options, customLayer) {
  * @param {string} url
  * @param {object} options
  * @param {object} customLayer
- * @returns {object}
+ * @returns {Promise<Object>}
  */
-export function topojsonLoad(url, options, customLayer) {
+export async function topojsonLoad(url, options, customLayer) {
   let layer = customLayer || L.geoJson();
-  xhr(url, onload);
 
-  function onload(err, response) {
-    if (err) return layer.fire('error', { error: err });
-    topojsonParse(response.responseText, options, layer);
-    layer.fire('ready');
+  const data = await readFileData(url);
+
+  const parsedData = topojsonParse(data, options);
+
+  try {
+    layer.addData(parsedData);
+    return layer;
+  } catch (err) {
+    throw Error("topoJSON not valid");
   }
-
-  return layer;
 }
 
 /**
@@ -50,27 +54,21 @@ export function topojsonLoad(url, options, customLayer) {
  * @param {string} url
  * @param {object} options
  * @param {object} customLayer
- * @returns {object}
+ * @returns {Promise<Object>}
  */
-export function csvLoad(url, options, customLayer) {
+export async function csvLoad(url, options, customLayer) {
   let layer = customLayer || L.geoJson();
-  xhr(url, onload);
 
-  function onload(err, response) {
-    let error;
-    if (err) return layer.fire('error', { error: err });
+  const data = await readFileData(url);
 
-    function avoidReady() {
-      error = true;
-    }
+  const parsedData = csvParse(data, options);
 
-    layer.on('error', avoidReady);
-    csvParse(response.responseText, options, layer);
-    layer.off('error', avoidReady);
-    if (!error) layer.fire('ready');
+  try {
+    layer.addData(parsedData);
+    return layer;
+  } catch (err) {
+    throw Error("Spatial data in CSV not valid");
   }
-
-  return layer;
 }
 
 /**
@@ -79,27 +77,21 @@ export function csvLoad(url, options, customLayer) {
  * @param {string} url
  * @param {object} options
  * @param {object} customLayer
- * @returns {object}
+ * @returns {Promise<Object>}
  */
-export function gpxLoad(url, options, customLayer) {
+export async function gpxLoad(url, options, customLayer) {
   let layer = customLayer || L.geoJson();
-  xhr(url, onload);
 
-  function onload(err, response) {
-    let error;
-    if (err) return layer.fire('error', { error: err });
+  const data = await readFileData(url);
 
-    function avoidReady() {
-      error = true;
-    }
+  const parsedData = gpxParse(data, options);
 
-    layer.on('error', avoidReady);
-    gpxParse(response.responseXML || response.responseText, options, layer);
-    layer.off('error', avoidReady);
-    if (!error) layer.fire('ready');
+  try {
+    layer.addData(parsedData);
+    return layer;
+  } catch (err) {
+    throw Error("GPX not valid");
   }
-
-  return layer;
 }
 
 /**
@@ -108,27 +100,21 @@ export function gpxLoad(url, options, customLayer) {
  * @param {string} url
  * @param {object} options
  * @param {object} customLayer
- * @returns {object}
+ * @returns {Promise<Object>}
  */
-export function kmlLoad(url, options, customLayer) {
+export async function kmlLoad(url, options, customLayer) {
   let layer = customLayer || L.geoJson();
-  xhr(url, onload);
 
-  function onload(err, response) {
-    let error;
-    if (err) return layer.fire('error', { error: err });
+  const data = await readFileData(url);
 
-    function avoidReady() {
-      error = true;
-    }
+  const parsedData = kmlParse(data, options);
 
-    layer.on('error', avoidReady);
-    kmlParse(response.responseXML || response.responseText, options, layer);
-    layer.off('error', avoidReady);
-    if (!error) layer.fire('ready');
+  try {
+    layer.addData(parsedData);
+    return layer;
+  } catch (err) {
+    throw Error("KML not valid");
   }
-
-  return layer;
 }
 
 /**
@@ -137,19 +123,21 @@ export function kmlLoad(url, options, customLayer) {
  * @param {string} url
  * @param {object} options
  * @param {object} customLayer
- * @returns {object}
+ * @returns {Promise<Object>}
  */
-export function wktLoad(url, options, customLayer) {
+export async function wktLoad(url, options, customLayer) {
   let layer = customLayer || L.geoJson();
-  xhr(url, onload);
 
-  function onload(err, response) {
-    if (err) return layer.fire('error', { error: err });
-    wktParse(response.responseText, options, layer);
-    layer.fire('ready');
+  const data = await readFileData(url);
+
+  const parsedData = wktParse(data, options);
+
+  try {
+    layer.addData(parsedData);
+    return layer;
+  } catch (err) {
+    throw Error("WKT not valid");
   }
-
-  return layer;
 }
 
 /**
@@ -158,17 +146,19 @@ export function wktLoad(url, options, customLayer) {
  * @param {string} url
  * @param {object} options
  * @param {object} customLayer
- * @returns {object}
+ * @returns {Object}
  */
-export function polylineLoad(url, options, customLayer) {
+export async function polylineLoad(url, options, customLayer) {
   let layer = customLayer || L.geoJson();
-  xhr(url, onload);
 
-  function onload(err, response) {
-    if (err) return layer.fire('error', { error: err });
-    polylineParse(response.responseText, options, layer);
-    layer.fire('ready');
+  const data = await readFileData(url);
+
+  const parsedData = polylineParse(data, options);
+
+  try {
+    layer.addData(parsedData);
+    return layer;
+  } catch (err) {
+    throw Error("Polyline not valid");
   }
-
-  return layer;
 }

@@ -1,9 +1,8 @@
-export function addData(l, d) {
-  if ('setGeoJSON' in l) {
-    l.setGeoJSON(d);
-  } else if ('addData' in l) {
-    l.addData(d);
-  }
+export function readFileData(blobUrl) {
+  return fetch(blobUrl)
+    .then((response) => response.blob())
+    .then((blob) => blob.text())
+    .catch((err) => null);
 }
 
 export function parseXML(str) {

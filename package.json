@@ -41,7 +41,6 @@
   },
   "homepage": "https://github.com/gabriel-russo/Leaflet.BetterFileLayer",
   "dependencies": {
-    "@mapbox/corslite": "^0.0.7",
     "@mapbox/polyline": "^0.2.0",
     "@mapbox/togeojson": "^0.16.0",
     "brfs": "^2.0.2",
