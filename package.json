@@ -8,6 +8,7 @@
   "main": "leaflet.betterfilelayer.min.js",
   "scripts": {
     "dev": "webpack --config=webpack.dev.config.js",
+    "test": "jest",
     "build": "webpack --config=webpack.config.js",
     "lint": "eslint src/leaflet.betterfilelayer.js"
   },
@@ -50,10 +51,16 @@
     "wellknown": "^0.5.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.22.11",
+    "@babel/preset-env": "^7.22.14",
+    "@jest/globals": "^29.6.4",
+    "babel-jest": "^29.6.4",
     "css-loader": "^6.8.1",
     "eslint": "^8.48.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-plugin-import": "^2.28.1",
+    "jest": "^29.6.4",
+    "jest-environment-jsdom": "^29.6.4",
     "mini-css-extract-plugin": "^2.7.6",
     "webpack": "^5.88.2",
     "webpack-cli": "^5.1.4"
