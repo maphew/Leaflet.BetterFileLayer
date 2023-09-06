@@ -131,9 +131,23 @@ L.Control.BetterFileLayer = L.Control.extend({
       if (loader) {
         const loaderOption = this.options.importOptions[file.type] || {};
 
-        loaderOption.fileName = getFileBaseName(file.name);
-
-        loaderOption.id = L.Util.stamp({});
+        loaderOption.layerOptions = {
+          fileName: getFileBaseName(file.name),
+          id: L.Util.stamp({}),
+          zIndex: 999,
+          onEachFeature: (feature, layer) => {
+            if (feature.properties) {
+              layer.bindPopup(
+                Object.keys(feature.properties)
+                  .map((k) => `${k} : ${feature.properties[k]}`)
+                  .join("<br />"),
+                {
+                  maxHeight: 200,
+                },
+              );
+            }
+          },
+        };
 
         const layer = await loader(URL.createObjectURL(file), loaderOption);
 

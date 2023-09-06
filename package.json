@@ -1,11 +1,11 @@
 {
   "name": "leaflet-better-filelayer",
-  "version": "0.0.1",
-  "description": "Load spatialized files into leaflet",
+  "version": "0.0.2",
+  "description": "Load spatialized files into leaflet using the HTML FileReader API",
   "files": [
     "dist"
   ],
-  "main": "leaflet.betterfilelayer.min.js",
+  "main": "dist/leaflet.betterfilelayer.min.js",
   "scripts": {
     "dev": "webpack --config=webpack.dev.config.js",
     "test": "jest",
@@ -36,7 +36,7 @@
     "converter"
   ],
   "author": "Gabriel Russo",
-  "license": "BSD-3-Clause",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/gabriel-russo/Leaflet.BetterFileLayer/issues"
   },

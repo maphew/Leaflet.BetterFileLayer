@@ -20,7 +20,7 @@ import {
  * @returns {Promise<Object>}
  */
 export async function geojsonLoad(url, options, customLayer) {
-  let layer = customLayer || L.geoJson(null, { name: options.fileName });
+  let layer = customLayer || L.geoJson(null, { ...options.layerOptions });
 
   const data = await readFileDataAsText(url);
 
@@ -41,7 +41,7 @@ export async function geojsonLoad(url, options, customLayer) {
  * @returns {Promise<Object>}
  */
 export async function topojsonLoad(url, options, customLayer) {
-  let layer = customLayer || L.geoJson();
+  let layer = customLayer || L.geoJson(null, { ...options.layerOptions });
 
   const data = await readFileDataAsText(url);
 
@@ -64,7 +64,7 @@ export async function topojsonLoad(url, options, customLayer) {
  * @returns {Promise<Object>}
  */
 export async function csvLoad(url, options, customLayer) {
-  let layer = customLayer || L.geoJson();
+  let layer = customLayer || L.geoJson(null, { ...options.layerOptions });
 
   const data = await readFileDataAsText(url);
 
@@ -87,7 +87,7 @@ export async function csvLoad(url, options, customLayer) {
  * @returns {Promise<Object>}
  */
 export async function gpxLoad(url, options, customLayer) {
-  let layer = customLayer || L.geoJson();
+  let layer = customLayer || L.geoJson(null, { ...options.layerOptions });
 
   const data = await readFileDataAsText(url);
 
@@ -110,7 +110,7 @@ export async function gpxLoad(url, options, customLayer) {
  * @returns {Promise<Object>}
  */
 export async function kmlLoad(url, options, customLayer) {
-  let layer = customLayer || L.geoJson();
+  let layer = customLayer || L.geoJson(null, { ...options.layerOptions });
 
   const data = await readFileDataAsText(url);
 
@@ -133,7 +133,7 @@ export async function kmlLoad(url, options, customLayer) {
  * @returns {Promise<Object>}
  */
 export async function wktLoad(url, options, customLayer) {
-  let layer = customLayer || L.geoJson();
+  let layer = customLayer || L.geoJson(null, { ...options.layerOptions });
 
   const data = await readFileDataAsText(url);
 
@@ -156,7 +156,7 @@ export async function wktLoad(url, options, customLayer) {
  * @returns {Object}
  */
 export async function polylineLoad(url, options, customLayer) {
-  let layer = customLayer || L.geoJson();
+  let layer = customLayer || L.geoJson(null, { ...options.layerOptions });
 
   const data = await readFileDataAsText(url);
 
@@ -179,7 +179,7 @@ export async function polylineLoad(url, options, customLayer) {
  * @returns {Object}
  */
 export async function shapefileLoad(url, options, customLayer) {
-  let layer = customLayer || L.geoJson();
+  let layer = customLayer || L.geoJson(null, { ...options.layerOptions });
 
   const data = await readFileDataAsArrayBuffer(url);
 
