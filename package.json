@@ -45,8 +45,11 @@
     "@mapbox/polyline": "^0.2.0",
     "@mapbox/togeojson": "^0.16.0",
     "brfs": "^2.0.2",
+    "buffer": "^6.0.3",
     "csv2geojson": "^5.1.2",
+    "jszip": "^3.10.1",
     "leaflet": "^1.9.4",
+    "shpjs": "^4.0.4",
     "topojson-client": "^3.1.0",
     "wellknown": "^0.5.0"
   },

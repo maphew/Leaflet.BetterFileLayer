@@ -1,14 +1,28 @@
 import * as L from "leaflet";
 import "./leaflet.betterfilelayer.css";
 import {
-  csvLoad, geojsonLoad, gpxLoad, kmlLoad, topojsonLoad, wktLoad,
+  csvLoad,
+  geojsonLoad,
+  gpxLoad,
+  kmlLoad,
+  polylineLoad,
+  shapefileLoad,
+  topojsonLoad,
+  wktLoad,
 } from "./leaflet.omnivore";
+import {
+  extractShpComponents,
+  filterShpComponents,
+  getFileBaseName,
+  getFileExtension,
+} from "./leaflet.betterfilelayer.utils";
+import { zipShpComponents } from "./leaflet.omnivore.utils";
 
 L.Control.BetterFileLayer = L.Control.extend({
   options: {
     position: 'topleft',
     importOptions: {
-      "text/csv": {
+      csv: {
         delimiter: ';',
         latfield: 'LAT',
         lonfield: 'LONG',
@@ -24,6 +38,12 @@ L.Control.BetterFileLayer = L.Control.extend({
   },
 
   onAdd() {
+    if (this.options.button) {
+      L.DomEvent.addListener(this.options.button, "change", this._load, this);
+      this._enableDragAndDrop();
+      return L.DomUtil.create("div");
+    }
+
     const container = L.DomUtil.create("div", "leaflet-control");
     const inputContainer = L.DomUtil.create("div", "leaflet-control-better-filelayer", container);
     const input = L.DomUtil.create("input", "", inputContainer);
@@ -40,6 +60,12 @@ L.Control.BetterFileLayer = L.Control.extend({
 
     L.DomEvent.addListener(input, "change", this._load, this);
 
+    this._enableDragAndDrop();
+
+    return container;
+  },
+
+  _enableDragAndDrop() {
     const mapContainer = this._map.getContainer();
 
     L.DomEvent.addListener(mapContainer, "dragover", L.DomEvent.stopPropagation)
@@ -47,11 +73,19 @@ L.Control.BetterFileLayer = L.Control.extend({
       .addListener(mapContainer, "drop", L.DomEvent.stopPropagation)
       .addListener(mapContainer, "drop", L.DomEvent.preventDefault)
       .addListener(mapContainer, "drop", this._load, this);
-
-    return container;
   },
 
-  _load(e) {
+  _disableDragAndDrop() {
+    const mapContainer = this._map.getContainer();
+
+    L.DomEvent.removeListener(mapContainer, "dragover", L.DomEvent.stopPropagation)
+      .removeListener(mapContainer, "dragover", L.DomEvent.preventDefault)
+      .removeListener(mapContainer, "drop", L.DomEvent.stopPropagation)
+      .removeListener(mapContainer, "drop", L.DomEvent.preventDefault)
+      .removeListener(mapContainer, "drop", this._load, this);
+  },
+
+  async _load(e) {
     const fileLoaders = {
       geojson: geojsonLoad,
       json: geojsonLoad,
@@ -60,46 +94,60 @@ L.Control.BetterFileLayer = L.Control.extend({
       wkt: wktLoad,
       gpx: gpxLoad,
       topojson: topojsonLoad,
+      polyline: polylineLoad,
+      zip: shapefileLoad,
     };
 
     let files;
     switch (e.type) {
       case "drop":
-        files = e.dataTransfer.files;
+        files = Array.of(...e.dataTransfer.files);
         break;
       case "change":
-        files = e.target.files;
+        files = Array.of(...e.target.files);
         break;
       default:
-        files = undefined;
+        files = [];
         break;
     }
 
+    if (!files.length) {
+      return;
+    }
+
+    const shpComponents = extractShpComponents(files);
+
+    if (Object.keys(shpComponents).length) {
+      const processedShps = await zipShpComponents(shpComponents);
+
+      const notShpFiles = filterShpComponents(files);
+
+      files = [...notShpFiles, ...processedShps];
+    }
+
     for (const file of files) {
-      const fileExtension = file.name.toLowerCase().split('.').at(-1);
+      const loader = fileLoaders[getFileExtension(file.name)] || null;
 
-      const loader = fileLoaders[fileExtension] || undefined;
+      if (loader) {
+        const loaderOption = this.options.importOptions[file.type] || {};
 
-      const loaderOption = this.options.importOptions[file.type] || {};
+        loaderOption.fileName = getFileBaseName(file.name);
 
-      if (!loader) {
-        return;
+        loaderOption.id = L.Util.stamp({});
+
+        const layer = await loader(URL.createObjectURL(file), loaderOption);
+
+        const addedLayer = layer.addTo(this._map);
+
+        this._map.fitBounds(layer.getBounds());
+
+        this._map.fire("bfl:layerloaded", { layer: addedLayer }, this);
       }
-
-      loader(URL.createObjectURL(file), loaderOption)
-        .then((layer) => {
-          const addedLayer = this._map.addLayer(layer);
-
-          this._map.fitBounds(layer.getBounds());
-
-          this._map.fire("bfl:layerloaded", { layer: addedLayer }, this);
-        }).catch((error) => {
-          this._map.fire("bfl:error", error);
-        });
     }
   },
 
   onRemove() {
+    this._disableDragAndDrop();
   },
 });
 

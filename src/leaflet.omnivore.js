@@ -1,7 +1,14 @@
+import "./polyfills";
 import * as L from "leaflet";
-import { readFileData } from "./leaflet.omnivore.utils";
+import * as shp from "shpjs";
+import { readFileDataAsArrayBuffer, readFileDataAsText } from "./leaflet.omnivore.utils";
 import {
-  topojsonParse, csvParse, wktParse, kmlParse, polylineParse, gpxParse,
+  csvParse,
+  gpxParse,
+  kmlParse,
+  polylineParse,
+  topojsonParse,
+  wktParse,
 } from "./leaflet.omnivore.parsers";
 
 /**
@@ -13,9 +20,9 @@ import {
  * @returns {Promise<Object>}
  */
 export async function geojsonLoad(url, options, customLayer) {
-  let layer = customLayer || L.geoJson();
+  let layer = customLayer || L.geoJson(null, { name: options.fileName });
 
-  const data = await readFileData(url);
+  const data = await readFileDataAsText(url);
 
   try {
     layer.addData(JSON.parse(data));
@@ -36,7 +43,7 @@ export async function geojsonLoad(url, options, customLayer) {
 export async function topojsonLoad(url, options, customLayer) {
   let layer = customLayer || L.geoJson();
 
-  const data = await readFileData(url);
+  const data = await readFileDataAsText(url);
 
   const parsedData = topojsonParse(data, options);
 
@@ -59,7 +66,7 @@ export async function topojsonLoad(url, options, customLayer) {
 export async function csvLoad(url, options, customLayer) {
   let layer = customLayer || L.geoJson();
 
-  const data = await readFileData(url);
+  const data = await readFileDataAsText(url);
 
   const parsedData = csvParse(data, options);
 
@@ -82,7 +89,7 @@ export async function csvLoad(url, options, customLayer) {
 export async function gpxLoad(url, options, customLayer) {
   let layer = customLayer || L.geoJson();
 
-  const data = await readFileData(url);
+  const data = await readFileDataAsText(url);
 
   const parsedData = gpxParse(data, options);
 
@@ -105,7 +112,7 @@ export async function gpxLoad(url, options, customLayer) {
 export async function kmlLoad(url, options, customLayer) {
   let layer = customLayer || L.geoJson();
 
-  const data = await readFileData(url);
+  const data = await readFileDataAsText(url);
 
   const parsedData = kmlParse(data, options);
 
@@ -128,7 +135,7 @@ export async function kmlLoad(url, options, customLayer) {
 export async function wktLoad(url, options, customLayer) {
   let layer = customLayer || L.geoJson();
 
-  const data = await readFileData(url);
+  const data = await readFileDataAsText(url);
 
   const parsedData = wktParse(data, options);
 
@@ -151,7 +158,7 @@ export async function wktLoad(url, options, customLayer) {
 export async function polylineLoad(url, options, customLayer) {
   let layer = customLayer || L.geoJson();
 
-  const data = await readFileData(url);
+  const data = await readFileDataAsText(url);
 
   const parsedData = polylineParse(data, options);
 
@@ -160,5 +167,28 @@ export async function polylineLoad(url, options, customLayer) {
     return layer;
   } catch (err) {
     throw Error("Polyline not valid");
+  }
+}
+
+/**
+ * Reads the zipped shapefile and return the layer
+ *
+ * @param {string} url
+ * @param {object} options
+ * @param {object} customLayer
+ * @returns {Object}
+ */
+export async function shapefileLoad(url, options, customLayer) {
+  let layer = customLayer || L.geoJson();
+
+  const data = await readFileDataAsArrayBuffer(url);
+
+  const parsedData = await shp(data);
+
+  try {
+    layer.addData(parsedData);
+    return layer;
+  } catch (err) {
+    throw Error("Shapefile not Valid");
   }
 }
