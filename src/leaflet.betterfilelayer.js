@@ -132,7 +132,7 @@ L.Control.BetterFileLayer = L.Control.extend({
         const loaderOption = this.options.importOptions[file.type] || {};
 
         loaderOption.layerOptions = {
-          fileName: getFileBaseName(file.name),
+          name: getFileBaseName(file.name),
           id: L.Util.stamp({}),
           zIndex: 999,
           onEachFeature: (feature, layer) => {

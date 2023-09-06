@@ -1,6 +1,6 @@
 {
   "name": "leaflet-better-filelayer",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Load spatialized files into leaflet using the HTML FileReader API",
   "files": [
     "dist"
