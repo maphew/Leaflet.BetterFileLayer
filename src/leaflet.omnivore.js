@@ -1,6 +1,6 @@
 import "./polyfills";
 import * as L from "leaflet";
-import * as shp from "shpjs";
+import shp from "shpjs";
 import { readFileDataAsArrayBuffer, readFileDataAsText } from "./leaflet.omnivore.utils";
 import {
   csvParse,

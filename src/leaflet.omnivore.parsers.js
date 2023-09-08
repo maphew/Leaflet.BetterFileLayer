@@ -82,5 +82,11 @@ export function polylineParse(txt, options) {
 }
 
 export function wktParse(wkt, options, layer) {
-  return wktParser(wkt);
+  const parseData = wktParser(wkt);
+
+  if (!parseData) {
+    return null;
+  }
+
+  return parseData;
 }

@@ -1,184 +1,124 @@
-# leaflet-omnivore
+# Leaflet.BetterFileLayer
 
-![](https://farm8.staticflickr.com/7373/12376158164_e335b4e61d_b.jpg)
+---
 
-[Leaflet](http://leafletjs.com/) supports the [GeoJSON](http://geojson.org/) format
-by default. What if you have something else? That's where omnivore comes in.
+### Load your spatialized files in Leaflet without too much effort.
+
+![](docs/images/ai.jpg)
+
+This is a [Leaflet](http://leafletjs.com/) plugin for loading your spatialized data in leaflet based on [leaflet-omnivore](https://github.com/mapbox/leaflet-omnivore) and [Leaflet.FileLayer](https://github.com/makinacorpus/Leaflet.FileLayer) plugins.
+This plugin was made looking for a definitive, expansible and easy to use plugin for loading external spatial files to leaflet. 
 
 It currently supports:
 
 * [CSV](http://en.wikipedia.org/wiki/Comma-separated_values) (via [csv2geojson](https://github.com/mapbox/csv2geojson))
-* GPX (via [toGeoJSON](https://github.com/mapbox/togeojson))
-* [KML](http://developers.google.com/kml/documentation/) (via [toGeoJSON](https://github.com/mapbox/togeojson))
+* [GPX](https://wiki.openstreetmap.org/wiki/GPX)
+* [KML](http://developers.google.com/kml/documentation/)
 * [WKT](http://en.wikipedia.org/wiki/Well-known_text) (via [wellknown](https://github.com/mapbox/wellknown))
-* [TopoJSON](https://github.com/mbostock/topojson)
-* [Encoded Polylines](https://developers.google.com/maps/documentation/utilities/polylinealgorithm) via [polyline](https://github.com/mapbox/polyline)
-
-Omnivore also includes an AJAX library, [corslite](https://github.com/mapbox/corslite),
-so you can specify what you want to add to the map with just a URL.
+* [TopoJSON](https://github.com/mbostock/topojson) (via [topojson-client](https://github.com/topojson/topojson-client))
+* [Encoded Polylines](https://developers.google.com/maps/documentation/utilities/polylinealgorithm) (via [polyline](https://github.com/mapbox/polyline))
+* [Shapefile](https://en.wikipedia.org/wiki/Shapefile) (via [shpjs](https://github.com/calvinmetcalf/shapefile-js/tree/gh-pages)) (zipped or in separate files)
 
 ## Installation
 
-use it easily with the [Mapbox Plugins CDN](http://mapbox.com/mapbox.js/plugins/#leaflet-omnivore):
-
-```html
-<script src='//api.tiles.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.3.1/leaflet-omnivore.min.js'></script>
+```commandline
+npm install leaflet-better-filelayer
 ```
 
+## Demo
 
-Or download `leaflet-omnivore.min.js` from this repository.
+Checkout the [Demo](https://gabriel-russo.github.io/Leaflet.BetterFileLayer/example/)
 
-## example
+Below gif show an example of loading a separated shapefile using drag and drop.
 
-Live examples:
+Note: The plugin only looks for `.shp`, `.dbf`, `.shx`, `.prj` with the same name.
 
-* [WKT](https://www.mapbox.com/mapbox.js/example/v1.0.0/omnivore-wkt/)
-* [TopoJSON](https://www.mapbox.com/mapbox.js/example/v1.0.0/omnivore-topojson/)
-* [Tooltips](https://www.mapbox.com/mapbox.js/example/v1.0.0/omnivore-kml-tooltip/)
-* [KML](https://www.mapbox.com/mapbox.js/example/v1.0.0/omnivore-kml/)
-* [GPX](https://www.mapbox.com/mapbox.js/example/v1.0.0/omnivore-gpx/)
-* [Icons](https://www.mapbox.com/mapbox.js/example/v1.0.0/markers-from-csv-custom-style/)
-* [CSV](https://www.mapbox.com/mapbox.js/example/v1.0.0/markers-from-csv/)
+![example](docs/images/example.gif)
+
+## Usage
+
+As map option:
 
 ```js
-var map = L.mapbox.map('map', 'mapbox.streets')
-    .setView([38, -102.0], 5);
-
-omnivore.csv('a.csv').addTo(map);
-omnivore.gpx('a.gpx').addTo(map);
-omnivore.kml('a.kml').addTo(map);
-omnivore.wkt('a.wkt').addTo(map);
-omnivore.topojson('a.topojson').addTo(map);
-omnivore.geojson('a.geojson').addTo(map);
-omnivore.polyline('a.txt').addTo(map);
+const map = L.map('map', { betterFileLayerControl: true })
 ```
 
-## API
-
-Arguments with `?` are optional. **parser_options** consists of options
-sent to the parser library, _not_ to the layer: if you want to provide options
-to the layer, see the example in the Custom Layers section.
-
-By default, the library will construct a `L.geoJson()` layer internally and
-call `.addData(geojson)` on it in order to load it full of GeoJSON. If you want
-to use a different kind of layer, like a `L.mapbox.featureLayer()`, you can,
-by passing it as `customLayer`, as long as it supports events and `addData()`.
-You can also use this API to pass custom options to a `L.geoJson()` instance.:
-
-
-* `.csv(url, parser_options?, customLayer?)`: Load & parse CSV, and return layer. Options are the same as [csv2geojson](https://github.com/mapbox/csv2geojson#api): `latfield, lonfield, delimiter`
-* `.csv.parse(csvString, parser_options?)`: Parse CSV, and return layer.
-* `.kml(url)`: Load & parse KML, and return layer.
-* `.kml.parse(kmlString | gpxDom)`: Parse KML from a string of XML or XML DOM, and return layer.
-* `.gpx(url, parser_options?, customLayer?)`: Load & parse GPX, and return layer.
-* `.gpx.parse(gpxString | gpxDom)`: Parse GPX from a string of XML or XML DOM, and return layer.
-* `.geojson(url, parser_options?, customLayer?)`: Load GeoJSON file at URL, parse GeoJSON, and return layer.
-* `.wkt(url, parser_options?, customLayer?)`: Load & parse WKT, and return layer.
-* `.wkt.parse(wktString)`: Parse WKT, and return layer.
-* `.topojson(url, parser_options?, customLayer?)`: Load & parse TopoJSON, and return layer.
-* `.topojson.parse(topojson)`: Parse TopoJSON (given as a string or object), and return layer.
-* `.polyline(url, parser_options?, customLayer?)`: Load & parse polyline, and return layer.
-* `.polyline.parse(txt, options, layer)`: Parse polyline (given as a string or object), and return layer.
-
-Valid options:
-
-#### polyline
-
-* `precision` will change how the polyline is interpreted. By default, the value
-  is 5. This is the [factor in the algorithm](https://developers.google.com/maps/documentation/utilities/polylinealgorithm),
-  by default 1e5, which is adjustable.
-
-### Custom Layers
-
-Passing custom options:
+Or like any control
 
 ```js
-var customLayer = L.geoJson(null, {
-    filter: function() {
-        // my custom filter function
-        return true;
-    }
-});
-
-var myLayer = omnivore.csv('foo', null, customLayer);
+L.Control.betterFileLayer().addTo(map);
 ```
 
-Adding custom styles to a GeoJSON layer:
+## Docs
+
+### Options:
+```js
+// Default plugin options object, change wathever you want
+options = {
+  position: 'topleft',
+  importOptions: { // Some file types may have import options, for now, just csv is documented
+    csv: {
+      delimiter: ';',
+      latfield: 'LAT',
+      lonfield: 'LONG',
+    },
+  },
+  text: {
+    title: "Import a layer", // Plugin Button Text
+  },
+}
+```
+
+### Events
+
+| Event Name                     | Data               | Description                                                                                               |
+|--------------------------------|--------------------|-----------------------------------------------------------------------------------------------------------|
+| `bfl:layerloaded`              | { layer: L.Layer } | Event fired when the data is sucessfuly loaded on map. It returns the layer reference                     |
+| `bfl:layerloaderror`           | { layer: string }  | Event fired when the loader fails to load your file. It returns the name of the file                      |
+| `bfl:filenotsupported`         | { layer: string }  | Event fired when the loader does not support the file type of your file. It returns the name of the file  |
+
+
+### Custom html button
+
+If you are developing a web application and you want to use your own html button outside the map container, you can use the following code:
 
 ```js
-var customLayer = L.geoJson(null, {
-    // http://leafletjs.com/reference.html#geojson-style
-    style: function(feature) {
-        return { color: '#f00' };
-    }
-});
-// this can be any kind of omnivore layer
-var runLayer = omnivore.kml('line.kml', null, customLayer)
+// Note: The button have to be type "file"
+// Example: <input type="file" accept=".gpx,.kml,.geojson,.json" multiple />
+const options = {
+  button: document.getElementById('my-button'), // Your html button HTML reference
+}
+
+const control = L.Control.qgsmeasure(options)
+  .addTo(map);
 ```
+After that, the plugin will bind an "on change" event on this button, waiting for files.
 
-Using a `L.mapbox.featureLayer`:
+You can see the example [here](https://gabriel-russo.github.io/Leaflet.BetterFileLayer/example/with-button.html)
 
-```js
-var layer = omnivore.gpx('a.gpx', null, L.mapbox.featureLayer());
-```
-
-### Async & Events
-
-Each function returns an `L.geoJson` object. Functions that load from URLs
-are **asynchronous**, so they will **not** immediately expose accurate `.setGeoJSON()` functions.
-
-For this reason, we fire events:
-
-* `ready`: fired when all data is loaded into the layer
-* `error`: fired if data can't be loaded or parsed
-
-```js
-var layer = omnivore.gpx('a.gpx')
-    .on('ready', function() {
-        // when this is fired, the layer
-        // is done being initialized
-    })
-    .on('error', function() {
-        // fired if the layer can't be loaded over AJAX
-        // or can't be parsed
-    })
-    .addTo(map);
-```
-
-`ready` does **not** fire if you don't use an asynchronous form of the function
-like `.topojson.parse()`: because you don't need an event. Just run your code
-after the call.
+`Note:` The Drag and Drop event listener will bind it self automatically
 
 ## Development
 
-This is a [browserify](http://browserify.org/) project:
-
-```sh
-git clone git@github.com:mapbox/leaflet-omnivore.git
-
-cd leaflet-omnivore
-
-# to run tests
-npm install
-
-# to build leaflet-omnivore.js
-npm run prepublish
+Install dependencies
+```commandline
+npm install --save-dev
 ```
 
-`leaflet-omnivore.js` and `leaflet-omnivore.min.js` are **built files** generated
-from `index.js` by `browserify`. If you find an issue, it either needs to be
-fixed in `index.js`, or in one of the libraries leaflet-omnivore uses
-to parse formats.
+Compile and save at dist/ after any change
+```commandline
+npm run dev
+```
 
-## FAQ
+Open `index.html` in your browser and start editing
 
-* **What if I just want one format?** Lucky for you, each format is specified
-  in a different module, so you can just use [TopoJSON](https://github.com/mbostock/topojson),
-  [csv2geojson](https://github.com/mapbox/csv2geojson), [wellknown](https://github.com/mapbox/wellknown), or
-  [toGeoJSON](https://github.com/mapbox/togeojson)
-  individually.
-* **My AJAX request is failing for a cross-domain request**. Read up on the [Same Origin Restriction](http://en.wikipedia.org/wiki/Same-origin_policy).
-  By default, we use corslite, so cross-domain requests will try to use [CORS](http://en.wikipedia.org/wiki/Cross-origin_resource_sharing)
-  if your server and browser supports it, but if one of them doesn't, there's no
-  way on the internet to support your request.
-* **Why isn't JSONP supported?** [Here's why](https://gist.github.com/tmcw/6244497).
+
+## Authors
+- Gabriel Russo
+
+## Credits
+
+- Copyright (c) 2014, Mapbox
+- Copyright (c) 2012, Michael Bostock
+
+See [License](https://github.com/gabriel-russo/Leaflet.BetterFileLayer/blob/master/LICENSE) for more details

@@ -34,7 +34,9 @@ L.Control.BetterFileLayer = L.Control.extend({
   },
 
   initialize(options) {
-    L.setOptions(this, options);
+    options = options || {};
+    options.text = L.Util.extend(this.options.text, options.text);
+    L.Util.setOptions(this, options);
   },
 
   onAdd() {
@@ -55,7 +57,7 @@ L.Control.BetterFileLayer = L.Control.extend({
     if (this.options.formats) {
       input.accept = this.options.formats.join(',');
     } else {
-      input.accept = '.gpx,.kml,.geojson,.json,.txt,.csv,.topojson,.wkt';
+      input.accept = '.gpx,.kml,.geojson,.json,.csv,.topojson,.wkt,.shp,.shx,.prj,.dbf,.zip';
     }
 
     L.DomEvent.addListener(input, "change", this._load, this);
@@ -115,6 +117,12 @@ L.Control.BetterFileLayer = L.Control.extend({
       return;
     }
 
+    /* Pre-processing:
+        - Search for shapefile components (.shp, .shx, .prj, .dbf) and group by file name
+        - If there is any grouped files, zip compress it
+        - After that, remove all shapefile components from list
+        - And merge the zipped shapefiles to the files list
+    */
     const shpComponents = extractShpComponents(files);
 
     if (Object.keys(shpComponents).length) {
@@ -149,13 +157,19 @@ L.Control.BetterFileLayer = L.Control.extend({
           },
         };
 
-        const layer = await loader(URL.createObjectURL(file), loaderOption);
+        try {
+          const layer = await loader(URL.createObjectURL(file), loaderOption);
 
-        const addedLayer = layer.addTo(this._map);
+          const addedLayer = layer.addTo(this._map);
 
-        this._map.fitBounds(layer.getBounds());
+          this._map.fitBounds(layer.getBounds());
 
-        this._map.fire("bfl:layerloaded", { layer: addedLayer }, this);
+          this._map.fire("bfl:layerloaded", { layer: addedLayer }, this);
+        } catch (err) {
+          this._map.fire("bfl:layerloaderror", { layer: file.name }, this);
+        }
+      } else {
+        this._map.fire("bfl:filenotsupported", { layer: file.name });
       }
     }
   },
