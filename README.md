@@ -1,23 +1,23 @@
 # Leaflet.BetterFileLayer
 
+### Load your spatialized files in Leaflet the way it should be.
+
 ---
 
-### Load your spatialized files in Leaflet without too much effort.
-
-![](docs/images/ai.jpg)
-
 This is a [Leaflet](http://leafletjs.com/) plugin for loading your spatialized data in leaflet based on [leaflet-omnivore](https://github.com/mapbox/leaflet-omnivore) and [Leaflet.FileLayer](https://github.com/makinacorpus/Leaflet.FileLayer) plugins.
-This plugin was made looking for a definitive, expansible and easy to use plugin for loading external spatial files to leaflet. 
+This plugin was made looking for a convenient and easy to use plugin for loading external spatial files to leaflet. 
 
 It currently supports:
 
+* [GeoJSON](http://geojson.org/)
+* [JSON](http://geojson.org/) (Using the GeoJSON structure)
 * [CSV](http://en.wikipedia.org/wiki/Comma-separated_values) (via [csv2geojson](https://github.com/mapbox/csv2geojson))
 * [GPX](https://wiki.openstreetmap.org/wiki/GPX)
 * [KML](http://developers.google.com/kml/documentation/)
 * [WKT](http://en.wikipedia.org/wiki/Well-known_text) (via [wellknown](https://github.com/mapbox/wellknown))
 * [TopoJSON](https://github.com/mbostock/topojson) (via [topojson-client](https://github.com/topojson/topojson-client))
 * [Encoded Polylines](https://developers.google.com/maps/documentation/utilities/polylinealgorithm) (via [polyline](https://github.com/mapbox/polyline))
-* [Shapefile](https://en.wikipedia.org/wiki/Shapefile) (via [shpjs](https://github.com/calvinmetcalf/shapefile-js/tree/gh-pages)) (zipped or in separate files)
+* [Shapefile](https://en.wikipedia.org/wiki/Shapefile) (via [shpjs](https://github.com/calvinmetcalf/shapefile-js/tree/gh-pages)) (zipped or separate files)
 
 ## Installation
 
@@ -53,9 +53,15 @@ L.Control.betterFileLayer().addTo(map);
 
 ### Options:
 ```js
-// Default plugin options object, change wathever you want
+// The Options object
 options = {
-  position: 'topleft',
+  position: 'topleft', // Leaflet control position
+  fileSizeLimit: 1024, // File size limit in kb (default: 1024 kb)
+  style: () => {}, // Overwrite the default BFL GeoJSON style function
+  onEachFeature: () => {}, // Overwrite the default BFL GeoJSON onEachFeature function
+  layer: L.customLayer, // If you want a custom layer to be used (must be a GeoJSON class inheritance)
+  // Restrict accepted file formats (default: .gpx, .kml, .geojson, .json, .csv, .topojson, .wkt, .shp, .shx, .prj, .dbf, .zip)
+  formats:['.geojson', '.kml', '.gpx'],
   importOptions: { // Some file types may have import options, for now, just csv is documented
     csv: {
       delimiter: ';',
@@ -63,7 +69,7 @@ options = {
       lonfield: 'LONG',
     },
   },
-  text: {
+  text: { // If you need translate
     title: "Import a layer", // Plugin Button Text
   },
 }
@@ -71,11 +77,12 @@ options = {
 
 ### Events
 
-| Event Name                     | Data               | Description                                                                                               |
-|--------------------------------|--------------------|-----------------------------------------------------------------------------------------------------------|
-| `bfl:layerloaded`              | { layer: L.Layer } | Event fired when the data is sucessfuly loaded on map. It returns the layer reference                     |
-| `bfl:layerloaderror`           | { layer: string }  | Event fired when the loader fails to load your file. It returns the name of the file                      |
-| `bfl:filenotsupported`         | { layer: string }  | Event fired when the loader does not support the file type of your file. It returns the name of the file  |
+| Event Name                   | Data               | Description                                                                                              |
+|------------------------------|--------------------|----------------------------------------------------------------------------------------------------------|
+| `bfl:layerloaded`            | { layer: L.Layer } | Event fired when the data is sucessfuly loaded on map. It returns the layer reference                    |
+| `bfl:layerloaderror`         | { layer: string }  | Event fired when the loader fails to load your file. It returns the name of the file                     |
+| `bfl:filenotsupported`       | { layer: string }  | Event fired when the loader does not support the file type of your file. It returns the name of the file |
+| `bfl:layerisempty`         | { layer: string }  | Event fired when the layer haven't any features. It returns the name of the file                         |
 
 
 ### Custom html button
@@ -100,18 +107,24 @@ You can see the example [here](https://gabriel-russo.github.io/Leaflet.BetterFil
 
 ## Development
 
-Install dependencies
+Install the development dependencies
 ```commandline
 npm install --save-dev
 ```
 
-Compile and save at dist/ after any change
+Start the webpack watch to compile and save at dist/ after any change
 ```commandline
 npm run dev
 ```
 
 Open `index.html` in your browser and start editing
 
+### Test
+
+To run unity tests:
+```commandline
+npm run test
+```
 
 ## Authors
 - Gabriel Russo

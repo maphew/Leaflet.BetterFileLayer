@@ -11,16 +11,18 @@ import {
   wktLoad,
 } from "./leaflet.omnivore";
 import {
+  bytesToKilobytes,
   extractShpComponents,
   filterShpComponents,
   getFileBaseName,
-  getFileExtension,
+  getFileExtension, getStyle,
 } from "./leaflet.betterfilelayer.utils";
 import { zipShpComponents } from "./leaflet.omnivore.utils";
 
 L.Control.BetterFileLayer = L.Control.extend({
   options: {
     position: 'topleft',
+    fileSizeLimit: 1024,
     importOptions: {
       csv: {
         delimiter: ';',
@@ -137,12 +139,22 @@ L.Control.BetterFileLayer = L.Control.extend({
       const loader = fileLoaders[getFileExtension(file.name)] || null;
 
       if (loader) {
+        if (bytesToKilobytes(file.size) > this.options.fileSizeLimit) {
+          continue;
+        }
+
         const loaderOption = this.options.importOptions[file.type] || {};
 
         loaderOption.layerOptions = {
           name: getFileBaseName(file.name),
           id: L.Util.stamp({}).toString(),
           zIndex: 999,
+          style: (feat) => {
+            const featStyle = getStyle(feat); // simplestyle-spec to leaflet path style
+            if (Object.keys(featStyle).length) {
+              return featStyle;
+            }
+          },
           onEachFeature: (feature, layer) => {
             if (feature.properties) {
               layer.bindPopup(
@@ -157,8 +169,21 @@ L.Control.BetterFileLayer = L.Control.extend({
           },
         };
 
+        if (this.options.style) {
+          loaderOption.style = this.options.style;
+        }
+
+        if (this.options.onEachFeature) {
+          loaderOption.onEachFeature = this.options.onEachFeature;
+        }
+
         try {
-          const layer = await loader(URL.createObjectURL(file), loaderOption);
+          const layer = await loader(URL.createObjectURL(file), loaderOption, this.options.layer || null);
+
+          if (!layer.getLayers().length) {
+            this._map.fire("bfl:layerisempty", { layer: file.name }, this);
+            continue;
+          }
 
           const addedLayer = layer.addTo(this._map);
 

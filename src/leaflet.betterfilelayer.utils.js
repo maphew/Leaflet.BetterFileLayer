@@ -69,3 +69,26 @@ export function filterShpComponents(files) {
 
   return filteredFiles;
 }
+
+export function getStyle(feat) {
+  // https://github.com/mapbox/simplestyle-spec
+  const simpleStyleSpec = {
+    stroke: "color", // the color of a line as part of a polygon, polyline, or multigeometry
+    "stroke-opacity": "opacity", // the opacity of the line component of a polygon, polyline, or multigeometry
+    "stroke-width": "weight", // the width of the line component of a polygon, polyline, or multigeometry
+    fill: "fillColor",
+    "fill-opacity": "fillOpacity",
+  };
+
+  let leafletPathStyle = {};
+
+  for (const prop in feat.properties) {
+    const style = simpleStyleSpec[prop] || null;
+
+    if (style) {
+      leafletPathStyle[style] = feat.properties[prop];
+    }
+  }
+
+  return leafletPathStyle;
+}
