@@ -3,7 +3,18 @@ import { parse as wktParser } from "wellknown";
 import { decode as polylineParser } from "@mapbox/polyline";
 import { feature as topojsonParser } from "topojson-client";
 import { kml as kmlParser, gpx as gpxParser } from "@mapbox/togeojson";
+import shp from "shpjs";
 import { parseXML } from "./leaflet.omnivore.utils";
+
+export function geojsonParse(data) {
+  const geojson = JSON.parse(data);
+
+  if (!geojson) {
+    return null;
+  }
+
+  return geojson;
+}
 
 export function topojsonParse(data, options) {
   let o = typeof data === 'string'
@@ -89,4 +100,14 @@ export function wktParse(wkt, options, layer) {
   }
 
   return parseData;
+}
+
+export async function shpParse(buf) {
+  const parsedData = await shp(buf);
+
+  if (!parsedData) {
+    return null;
+  }
+
+  return parsedData;
 }

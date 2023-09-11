@@ -1,12 +1,12 @@
 import "./polyfills";
 import * as L from "leaflet";
-import shp from "shpjs";
 import { readFileDataAsArrayBuffer, readFileDataAsText } from "./leaflet.omnivore.utils";
 import {
-  csvParse,
+  csvParse, geojsonParse,
   gpxParse,
   kmlParse,
   polylineParse,
+  shpParse,
   topojsonParse,
   wktParse,
 } from "./leaflet.omnivore.parsers";
@@ -14,18 +14,20 @@ import {
 /**
  * Load a [GeoJSON](http://geojson.org/) document into a layer and return the layer.
  *
- * @param {string} url
+ * @param {string} blobUrl
  * @param {object} options
  * @param {object} customLayer
  * @returns {Promise<Object>}
  */
-export async function geojsonLoad(url, options, customLayer) {
+export async function geojsonLoad(blobUrl, options, customLayer) {
   let layer = customLayer || L.geoJson(null, { ...options.layerOptions });
 
-  const data = await readFileDataAsText(url);
+  const data = await readFileDataAsText(blobUrl);
+
+  const parsedData = geojsonParse(data);
 
   try {
-    layer.addData(JSON.parse(data));
+    layer.addData(parsedData);
     return layer;
   } catch (err) {
     throw Error("GeoJSON not valid");
@@ -35,15 +37,15 @@ export async function geojsonLoad(url, options, customLayer) {
 /**
  * Load a [TopoJSON](https://github.com/mbostock/topojson) document into a layer and return the layer.
  *
- * @param {string} url
+ * @param {string} blobUrl
  * @param {object} options
  * @param {object} customLayer
  * @returns {Promise<Object>}
  */
-export async function topojsonLoad(url, options, customLayer) {
+export async function topojsonLoad(blobUrl, options, customLayer) {
   let layer = customLayer || L.geoJson(null, { ...options.layerOptions });
 
-  const data = await readFileDataAsText(url);
+  const data = await readFileDataAsText(blobUrl);
 
   const parsedData = topojsonParse(data, options);
 
@@ -58,15 +60,15 @@ export async function topojsonLoad(url, options, customLayer) {
 /**
  * Load a CSV document into a layer and return the layer.
  *
- * @param {string} url
+ * @param {string} blobUrl
  * @param {object} options
  * @param {object} customLayer
  * @returns {Promise<Object>}
  */
-export async function csvLoad(url, options, customLayer) {
+export async function csvLoad(blobUrl, options, customLayer) {
   let layer = customLayer || L.geoJson(null, { ...options.layerOptions });
 
-  const data = await readFileDataAsText(url);
+  const data = await readFileDataAsText(blobUrl);
 
   const parsedData = csvParse(data, options);
 
@@ -81,15 +83,15 @@ export async function csvLoad(url, options, customLayer) {
 /**
  * Load a GPX document into a layer and return the layer.
  *
- * @param {string} url
+ * @param {string} blobUrl
  * @param {object} options
  * @param {object} customLayer
  * @returns {Promise<Object>}
  */
-export async function gpxLoad(url, options, customLayer) {
+export async function gpxLoad(blobUrl, options, customLayer) {
   let layer = customLayer || L.geoJson(null, { ...options.layerOptions });
 
-  const data = await readFileDataAsText(url);
+  const data = await readFileDataAsText(blobUrl);
 
   const parsedData = gpxParse(data, options);
 
@@ -104,15 +106,15 @@ export async function gpxLoad(url, options, customLayer) {
 /**
  * Load a [KML](https://developers.google.com/kml/documentation/) document into a layer and return the layer.
  *
- * @param {string} url
+ * @param {string} blobUrl
  * @param {object} options
  * @param {object} customLayer
  * @returns {Promise<Object>}
  */
-export async function kmlLoad(url, options, customLayer) {
+export async function kmlLoad(blobUrl, options, customLayer) {
   let layer = customLayer || L.geoJson(null, { ...options.layerOptions });
 
-  const data = await readFileDataAsText(url);
+  const data = await readFileDataAsText(blobUrl);
 
   const parsedData = kmlParse(data, options);
 
@@ -127,15 +129,15 @@ export async function kmlLoad(url, options, customLayer) {
 /**
  * Load a WKT (Well Known Text) string into a layer and return the layer
  *
- * @param {string} url
+ * @param {string} blobUrl
  * @param {object} options
  * @param {object} customLayer
  * @returns {Promise<Object>}
  */
-export async function wktLoad(url, options, customLayer) {
+export async function wktLoad(blobUrl, options, customLayer) {
   let layer = customLayer || L.geoJson(null, { ...options.layerOptions });
 
-  const data = await readFileDataAsText(url);
+  const data = await readFileDataAsText(blobUrl);
 
   const parsedData = wktParse(data, options);
 
@@ -150,15 +152,15 @@ export async function wktLoad(url, options, customLayer) {
 /**
  * Load a polyline string into a layer and return the layer
  *
- * @param {string} url
+ * @param {string} blobUrl
  * @param {object} options
  * @param {object} customLayer
  * @returns {Object}
  */
-export async function polylineLoad(url, options, customLayer) {
+export async function polylineLoad(blobUrl, options, customLayer) {
   let layer = customLayer || L.geoJson(null, { ...options.layerOptions });
 
-  const data = await readFileDataAsText(url);
+  const data = await readFileDataAsText(blobUrl);
 
   const parsedData = polylineParse(data, options);
 
@@ -173,17 +175,17 @@ export async function polylineLoad(url, options, customLayer) {
 /**
  * Reads the zipped shapefile and return the layer
  *
- * @param {string} url
+ * @param {string} blobUrl
  * @param {object} options
  * @param {object} customLayer
  * @returns {Object}
  */
-export async function shapefileLoad(url, options, customLayer) {
+export async function shapefileLoad(blobUrl, options, customLayer) {
   let layer = customLayer || L.geoJson(null, { ...options.layerOptions });
 
-  const data = await readFileDataAsArrayBuffer(url);
+  const data = await readFileDataAsArrayBuffer(blobUrl);
 
-  const parsedData = await shp(data);
+  const parsedData = await shpParse(data);
 
   try {
     layer.addData(parsedData);
