@@ -1,6 +1,6 @@
 # Leaflet.BetterFileLayer
 
-### Load your spatialized files in Leaflet the way it should be.
+### Load your spatialized files into Leaflet the way it should be.
 
 ---
 
@@ -96,7 +96,7 @@ const options = {
   button: document.getElementById('my-button'), // Your html button HTML reference
 }
 
-const control = L.Control.qgsmeasure(options)
+const control = L.Control.betterFileLayer(options)
   .addTo(map);
 ```
 After that, the plugin will bind an "on change" event on this button, waiting for files.
@@ -133,5 +133,6 @@ npm run test
 
 - Copyright (c) 2014, Mapbox
 - Copyright (c) 2012, Michael Bostock
+- Copyright (c) 2012 Makina Corpus
 
 See [License](https://github.com/gabriel-russo/Leaflet.BetterFileLayer/blob/master/LICENSE) for more details
