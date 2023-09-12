@@ -1,3 +1,5 @@
+import JSZip from "jszip";
+
 /**
  * Returns the file's extension without dot
  *
@@ -49,6 +51,33 @@ export function extractShpComponents(files) {
   }
 
   return shpComponents;
+}
+
+/**
+ * Gets the object returned from extractShpComponents function and create a list of
+ * in-memory zipped shapefiles from every key.
+ * In summary: Gets the shapefile components (.shp, .dbf, .prj ...) grouped by name and zip compress
+ * @param {Object} shapes
+ * @returns {Array}
+ */
+export async function zipShpComponents(shapes) {
+  const zips = [];
+
+  for (const shapeName in shapes) {
+    const zip = new JSZip();
+
+    for (const component of shapes[shapeName]) {
+      zip.file(component.name, component.arrayBuffer());
+    }
+
+    const blob = await zip.generateAsync({ type: "blob" });
+
+    const shpZip = new File([blob], `${shapeName}.zip`, { type: "application/zip" });
+
+    zips.push(shpZip);
+  }
+
+  return zips;
 }
 
 /**
