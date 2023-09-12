@@ -141,6 +141,7 @@ L.Control.BetterFileLayer = L.Control.extend({
 
       if (loader) {
         if (bytesToKilobytes(file.size) > this.options.fileSizeLimit) {
+          this._map.fire("bfl:filesizelimit", { layer: file.name }, this);
           continue;
         }
 

@@ -77,12 +77,13 @@ options = {
 
 ### Events
 
-| Event Name                   | Data               | Description                                                                                              |
-|------------------------------|--------------------|----------------------------------------------------------------------------------------------------------|
-| `bfl:layerloaded`            | { layer: L.Layer } | Event fired when the data is sucessfuly loaded on map. It returns the layer reference                    |
-| `bfl:layerloaderror`         | { layer: string }  | Event fired when the loader fails to load your file. It returns the name of the file                     |
-| `bfl:filenotsupported`       | { layer: string }  | Event fired when the loader does not support the file type of your file. It returns the name of the file |
-| `bfl:layerisempty`         | { layer: string }  | Event fired when the layer haven't any features. It returns the name of the file                         |
+| Event Name                   | Data               | Description                                                                                                          |
+|------------------------------|--------------------|----------------------------------------------------------------------------------------------------------------------|
+| `bfl:layerloaded`            | { layer: L.Layer } | Event fired when the data is sucessfuly loaded on map. It returns the layer reference                                |
+| `bfl:layerloaderror`         | { layer: string }  | Event fired when the loader fails to load your file. It returns the name of the file                                 |
+| `bfl:filenotsupported`       | { layer: string }  | Event fired when the loader does not support the file type of your file. It returns the name of the file             |
+| `bfl:layerisempty`         | { layer: string }  | Event fired when the layer haven't any features. It returns the name of the file                                     |
+| `bfl:filesizelimit`         | { layer: string }  | Event fired when the file's size exceeds the file size limit (fileSizeLimit option). It returns the name of the file |
 
 
 ### Custom html button
