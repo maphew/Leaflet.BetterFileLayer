@@ -15,9 +15,10 @@ import {
   extractShpComponents,
   filterShpComponents,
   getFileBaseName,
-  getFileExtension, getStyle,
+  getFileExtension,
+  getStyle,
+  zipShpComponents,
 } from "./leaflet.betterfilelayer.utils";
-import { zipShpComponents } from "./leaflet.omnivore.utils";
 
 L.Control.BetterFileLayer = L.Control.extend({
   options: {
@@ -143,9 +144,9 @@ L.Control.BetterFileLayer = L.Control.extend({
           continue;
         }
 
-        const loaderOption = this.options.importOptions[file.type] || {};
+        const parserOptions = this.options.importOptions[getFileExtension(file.name)] || {};
 
-        loaderOption.layerOptions = {
+        const layerOptions = {
           name: getFileBaseName(file.name),
           id: L.Util.stamp({}).toString(),
           zIndex: 999,
@@ -170,15 +171,17 @@ L.Control.BetterFileLayer = L.Control.extend({
         };
 
         if (this.options.style) {
-          loaderOption.style = this.options.style;
+          layerOptions.style = this.options.style;
         }
 
         if (this.options.onEachFeature) {
-          loaderOption.onEachFeature = this.options.onEachFeature;
+          layerOptions.onEachFeature = this.options.onEachFeature;
         }
 
+        const options = { parserOptions, layerOptions };
+
         try {
-          const layer = await loader(URL.createObjectURL(file), loaderOption, this.options.layer || null);
+          const layer = await loader(URL.createObjectURL(file), options, this.options.layer || null);
 
           if (!layer.getLayers().length) {
             this._map.fire("bfl:layerisempty", { layer: file.name }, this);

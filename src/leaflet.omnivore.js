@@ -47,7 +47,7 @@ export async function topojsonLoad(blobUrl, options, customLayer) {
 
   const data = await readFileDataAsText(blobUrl);
 
-  const parsedData = topojsonParse(data, options);
+  const parsedData = topojsonParse(data, options.parserOptions);
 
   try {
     layer.addData(parsedData);
@@ -70,7 +70,7 @@ export async function csvLoad(blobUrl, options, customLayer) {
 
   const data = await readFileDataAsText(blobUrl);
 
-  const parsedData = csvParse(data, options);
+  const parsedData = csvParse(data, options.parserOptions);
 
   try {
     layer.addData(parsedData);
@@ -93,7 +93,7 @@ export async function gpxLoad(blobUrl, options, customLayer) {
 
   const data = await readFileDataAsText(blobUrl);
 
-  const parsedData = gpxParse(data, options);
+  const parsedData = gpxParse(data, options.parserOptions);
 
   try {
     layer.addData(parsedData);
@@ -116,7 +116,7 @@ export async function kmlLoad(blobUrl, options, customLayer) {
 
   const data = await readFileDataAsText(blobUrl);
 
-  const parsedData = kmlParse(data, options);
+  const parsedData = kmlParse(data, options.parserOptions);
 
   try {
     layer.addData(parsedData);
@@ -139,7 +139,7 @@ export async function wktLoad(blobUrl, options, customLayer) {
 
   const data = await readFileDataAsText(blobUrl);
 
-  const parsedData = wktParse(data, options);
+  const parsedData = wktParse(data, options.parserOptions);
 
   try {
     layer.addData(parsedData);
@@ -162,7 +162,7 @@ export async function polylineLoad(blobUrl, options, customLayer) {
 
   const data = await readFileDataAsText(blobUrl);
 
-  const parsedData = polylineParse(data, options);
+  const parsedData = polylineParse(data, options.parserOptions);
 
   try {
     layer.addData(parsedData);
