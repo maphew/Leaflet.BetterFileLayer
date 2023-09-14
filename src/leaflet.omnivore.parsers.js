@@ -4,6 +4,7 @@ import { decode as polylineParser } from "@mapbox/polyline";
 import { feature as topojsonParser } from "topojson-client";
 import { kml as kmlParser, gpx as gpxParser } from "@mapbox/togeojson";
 import shp from "shpjs";
+import JSZip from "jszip";
 import { parseXML } from "./leaflet.omnivore.utils";
 
 export function geojsonParse(data) {
@@ -68,6 +69,22 @@ export function kmlParse(rawData, options) {
   }
 
   return kmlParser(xml);
+}
+
+export async function kmzParse(rawData, options) {
+  const { files } = await JSZip.loadAsync(rawData);
+
+  let kmlFile;
+
+  for (const file in files) {
+    if (file.endsWith(".kml")) {
+      kmlFile = files[file];
+    }
+  }
+
+  const xml = await kmlFile.async("text");
+
+  return kmlParse(xml);
 }
 
 export function polylineParse(txt, options) {

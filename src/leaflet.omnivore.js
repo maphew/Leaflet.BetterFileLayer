@@ -5,6 +5,7 @@ import {
   csvParse, geojsonParse,
   gpxParse,
   kmlParse,
+  kmzParse,
   polylineParse,
   shpParse,
   topojsonParse,
@@ -123,6 +124,21 @@ export async function kmlLoad(blobUrl, options, customLayer) {
     return layer;
   } catch (err) {
     throw Error("KML not valid");
+  }
+}
+
+export async function kmzLoad(blobUrl, options, customLayer) {
+  let layer = customLayer || L.geoJson(null, { ...options.layerOptions });
+
+  const data = await readFileDataAsArrayBuffer(blobUrl);
+
+  const parsedData = await kmzParse(data, options.parserOptions);
+
+  try {
+    layer.addData(parsedData);
+    return layer;
+  } catch (err) {
+    throw Error("KMZ not valid");
   }
 }
 

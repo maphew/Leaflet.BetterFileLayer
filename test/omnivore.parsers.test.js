@@ -5,7 +5,7 @@
 import { test, expect } from "@jest/globals";
 import { readFileSync } from "node:fs";
 import {
-  topojsonParse, csvParse, wktParse, kmlParse, polylineParse, gpxParse,
+  topojsonParse, csvParse, wktParse, kmlParse, polylineParse, gpxParse, kmzParse,
 } from "../src/leaflet.omnivore.parsers";
 
 test('Testing .TOPOJSON Parser', () => {
@@ -147,21 +147,6 @@ test("Testing .KML Parser", () => {
         geometry: {
           type: "Point",
           coordinates: [
-            -122.0822035425683,
-            37.42228990140251,
-            0,
-          ],
-        },
-        properties: {
-          name: "Simple placemark",
-          description: "Attached to the ground. Intelligently places itself \n       at the height of the underlying terrain.",
-        },
-      },
-      {
-        type: "Feature",
-        geometry: {
-          type: "Point",
-          coordinates: [
             -120.0822035425683,
             37.42228990140251,
             0,
@@ -169,7 +154,40 @@ test("Testing .KML Parser", () => {
         },
         properties: {
           name: "Simple placemark two",
+          description: "Attached to the ground. Intelligently places itself\n       at the height of the underlying terrain.",
+          tessellate: "-1",
+          extrude: "0",
+          visibility: "-1",
+        },
+      },
+    ],
+  };
+
+  return expect(parsedKml).toStrictEqual(expectedGeoJson);
+});
+
+test("Testing .KMZ Parser", async () => {
+  const parsedKml = await kmzParse(readFileSync("./test/a.kmz", 'binary'));
+
+  const expectedGeoJson = {
+    type: "FeatureCollection",
+    features: [
+      {
+        type: "Feature",
+        geometry: {
+          type: "Point",
+          coordinates: [
+            -120.082203542568,
+            37.4222899014025,
+            0,
+          ],
+        },
+        properties: {
+          name: "Simple placemark two",
           description: "Attached to the ground. Intelligently places itself \n       at the height of the underlying terrain.",
+          tessellate: "-1",
+          extrude: "0",
+          visibility: "-1",
         },
       },
     ],
