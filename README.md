@@ -13,7 +13,7 @@ It currently supports:
 * [JSON](http://geojson.org/) (Using the GeoJSON structure)
 * [CSV](http://en.wikipedia.org/wiki/Comma-separated_values) (via [csv2geojson](https://github.com/mapbox/csv2geojson))
 * [GPX](https://wiki.openstreetmap.org/wiki/GPX)
-* [KML](http://developers.google.com/kml/documentation/)
+* [KML](https://developers.google.com/kml/documentation/)
 * [KMZ](https://developers.google.com/kml/documentation/kmzarchives)
 * [WKT](http://en.wikipedia.org/wiki/Well-known_text) (via [wellknown](https://github.com/mapbox/wellknown))
 * [TopoJSON](https://github.com/mbostock/topojson) (via [topojson-client](https://github.com/topojson/topojson-client))
@@ -61,7 +61,7 @@ options = {
   style: () => {}, // Overwrite the default BFL GeoJSON style function
   onEachFeature: () => {}, // Overwrite the default BFL GeoJSON onEachFeature function
   layer: L.customLayer, // If you want a custom layer to be used (must be a GeoJSON class inheritance)
-  // Restrict accepted file formats (default: .gpx, .kml, .geojson, .json, .csv, .topojson, .wkt, .shp, .shx, .prj, .dbf, .zip)
+  // Restrict accepted file formats (default: .gpx, .kml, .kmz, .geojson, .json, .csv, .topojson, .wkt, .shp, .shx, .prj, .dbf, .zip)
   formats:['.geojson', '.kml', '.gpx'],
   importOptions: { // Some file types may have import options, for now, just csv is documented
     csv: {

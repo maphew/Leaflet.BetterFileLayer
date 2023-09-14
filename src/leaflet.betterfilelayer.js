@@ -61,7 +61,7 @@ L.Control.BetterFileLayer = L.Control.extend({
     if (this.options.formats) {
       input.accept = this.options.formats.join(',');
     } else {
-      input.accept = '.gpx,.kml,.geojson,.json,.csv,.topojson,.wkt,.shp,.shx,.prj,.dbf,.zip';
+      input.accept = '.gpx,.kml,.kmz,.geojson,.json,.csv,.topojson,.wkt,.shp,.shx,.prj,.dbf,.zip';
     }
 
     L.DomEvent.addListener(input, "change", this._load, this);
