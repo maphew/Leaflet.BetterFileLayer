@@ -2,9 +2,14 @@
 
 ### Load your spatialized files into Leaflet the way it should be.
 
+![npm](https://img.shields.io/npm/v/leaflet-better-filelayer)
+![downloads](https://img.shields.io/npm/dm/leaflet-better-filelayer)
+![license](https://img.shields.io/npm/l/leaflet-better-filelayer)
+![GitHub Workflow Status](https://github.com/gabriel-russo/Leaflet.BetterFileLayer/actions/workflows/testing.yml/badge.svg)
+
 ---
 
-This is a [Leaflet](http://leafletjs.com/) plugin for loading your spatialized data in leaflet based on [leaflet-omnivore](https://github.com/mapbox/leaflet-omnivore) and [Leaflet.FileLayer](https://github.com/makinacorpus/Leaflet.FileLayer) plugins.
+This is a [Leaflet](http://leafletjs.com/) plugin for loading your spatialized data into leaflet based on [leaflet-omnivore](https://github.com/mapbox/leaflet-omnivore) and [Leaflet.FileLayer](https://github.com/makinacorpus/Leaflet.FileLayer) plugins.
 This plugin was made looking for a convenient and easy to use plugin for loading external spatial files to leaflet. 
 
 It currently supports:
@@ -95,7 +100,7 @@ If you are developing a web application and you want to use your own html button
 // Note: The button have to be type "file"
 // Example: <input type="file" accept=".gpx,.kml,.geojson,.json" multiple />
 const options = {
-  button: document.getElementById('my-button'), // Your html button HTML reference
+  button: document.getElementById('my-button'), // Your button HTML reference
 }
 
 const control = L.Control.betterFileLayer(options)
