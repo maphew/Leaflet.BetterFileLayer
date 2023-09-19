@@ -99,7 +99,13 @@ export function filterShpComponents(files) {
   return filteredFiles;
 }
 
-export function getStyle(feat) {
+/**
+ * Transform the simple style spec from feature props to Leaflet Path styles options
+ *
+ * @param {Object} feature
+ * @returns {Object} Leaflet path styling options
+ */
+export function simpleStyleToLeafletStyle(feature) {
   // https://github.com/mapbox/simplestyle-spec
   const simpleStyleSpec = {
     stroke: "color", // the color of a line as part of a polygon, polyline, or multigeometry
@@ -111,13 +117,38 @@ export function getStyle(feat) {
 
   let leafletPathStyle = {};
 
-  for (const prop in feat.properties) {
+  for (const prop in feature.properties) {
     const style = simpleStyleSpec[prop] || null;
 
     if (style) {
-      leafletPathStyle[style] = feat.properties[prop];
+      leafletPathStyle[style] = feature.properties[prop];
     }
   }
 
   return leafletPathStyle;
+}
+
+/**
+ * Filters a property based on a blacklist of property names considered not required info to
+ * be displayed
+ *
+ * @param {String} prop Property name
+ * @returns {Boolean} Returns true if property is in blacklist and need to be sanitized
+ */
+export function sanitizeProperty(prop) {
+  const blackList = [
+    "marker-size",
+    "marker-symbol",
+    "marker-color",
+    "stroke",
+    "stroke-opacity",
+    "stroke-width",
+    "fill",
+    "fill-opacity",
+    "styleHash",
+    "styleUrl",
+    "styleMapHash",
+  ];
+
+  return blackList.includes(prop);
 }

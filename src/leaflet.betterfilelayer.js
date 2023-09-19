@@ -17,7 +17,8 @@ import {
   filterShpComponents,
   getFileBaseName,
   getFileExtension,
-  getStyle,
+  sanitizeProperty,
+  simpleStyleToLeafletStyle,
   zipShpComponents,
 } from "./leaflet.betterfilelayer.utils";
 
@@ -154,19 +155,33 @@ L.Control.BetterFileLayer = L.Control.extend({
           id: L.Util.stamp({}).toString(),
           zIndex: 999,
           style: (feat) => {
-            const featStyle = getStyle(feat); // simplestyle-spec to leaflet path style
+            // simplestyle-spec to leaflet path style
+            const featStyle = simpleStyleToLeafletStyle(feat);
             if (Object.keys(featStyle).length) {
               return featStyle;
             }
           },
           onEachFeature: (feature, layer) => {
             if (feature.properties) {
+              const rows = Object.keys(feature.properties)
+                .map((key) => {
+                  const isPropBanned = sanitizeProperty(key);
+
+                  if (!isPropBanned) {
+                    return `<span> <b>${key}</b> : ${feature.properties[key]} </span>`;
+                  }
+
+                  return null;
+                });
+
               layer.bindPopup(
-                Object.keys(feature.properties)
-                  .map((k) => `${k} : ${feature.properties[k]}`)
-                  .join("<br />"),
+                `
+                  <div style="display:flex;flex-direction:column;gap:5px"> 
+                      ${rows.join("")}
+                  </div>
+                `,
                 {
-                  maxHeight: 200,
+                  maxHeight: 240,
                 },
               );
             }
