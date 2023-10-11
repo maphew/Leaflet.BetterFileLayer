@@ -13,9 +13,9 @@
 
     <!-- Leaflet BetterFileLayer -->
     <script type="application/javascript"
-            src="https://unpkg.com/leaflet-better-filelayer@0.1.0/dist/leaflet.betterfilelayer.min.js"
+            src="https://unpkg.com/leaflet-better-filelayer@0.1.1/dist/leaflet.betterfilelayer.min.js"
             crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-better-filelayer@0.1.0/dist/leaflet.betterfilelayer.css"
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-better-filelayer@0.1.1/dist/leaflet.betterfilelayer.css"
           crossorigin="anonymous" referrerpolicy="no-referrer">
 </head>
 
@@ -50,7 +50,7 @@
     <a href="https://github.com/gabriel-russo/Leaflet.BetterFileLayer">github.com/gabriel-russo/Leaflet.BetterFileLayer</a>
 </div>
 <div id="map" style="width: 98vw; height: 85vh"></div>
-<div><a href="with-button.html">Example with custom html button</a></div>
+<div style="margin-top: 10px"><a href="with-button.html">Example with external html input</a></div>
 </body>
 
 <script type="text/javascript">
@@ -59,7 +59,7 @@
   });
 
   const map = L.map('map')
-    .setView([-15.798654271090207, -47.86738872528077], 17)
+    .setView([-15.798654271090207, -47.86738872528077], 4)
     .addLayer(wi);
 
   L.Control.betterFileLayer()
