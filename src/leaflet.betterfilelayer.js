@@ -17,7 +17,7 @@ import {
   filterShpComponents,
   getFileBaseName,
   getFileExtension,
-  sanitizeProperty,
+  filterProperty,
   simpleStyleToLeafletStyle,
   zipShpComponents,
 } from "./leaflet.betterfilelayer.utils";
@@ -165,7 +165,7 @@ L.Control.BetterFileLayer = L.Control.extend({
             if (feature.properties) {
               const rows = Object.keys(feature.properties)
                 .map((key) => {
-                  const isPropBanned = sanitizeProperty(key);
+                  const isPropBanned = filterProperty(key);
 
                   if (!isPropBanned) {
                     return `<span> <b>${key}</b> : ${feature.properties[key]} </span>`;

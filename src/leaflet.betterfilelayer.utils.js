@@ -135,7 +135,7 @@ export function simpleStyleToLeafletStyle(feature) {
  * @param {String} prop Property name
  * @returns {Boolean} Returns true if property is in blacklist and need to be sanitized
  */
-export function sanitizeProperty(prop) {
+export function filterProperty(prop) {
   const blackList = [
     "marker-size",
     "marker-symbol",
@@ -148,6 +148,7 @@ export function sanitizeProperty(prop) {
     "styleHash",
     "styleUrl",
     "styleMapHash",
+    "stroke-dasharray",
   ];
 
   return blackList.includes(prop);
