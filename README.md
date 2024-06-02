@@ -57,6 +57,8 @@ L.Control.betterFileLayer().addTo(map);
 
 ## Docs
 
+> For more detailed docs, please check the [wiki](https://github.com/gabriel-russo/Leaflet.BetterFileLayer/wiki)
+
 ### Options:
 ```js
 // The Options object
