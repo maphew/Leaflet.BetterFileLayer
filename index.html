@@ -11,9 +11,30 @@
     <!-- Files from current project -->
     <link rel="stylesheet" href="dist/leaflet.betterfilelayer.css">
     <script type="text/javascript" src="dist/leaflet.betterfilelayer.min.js"></script>
+    
+    <style>
+        .info-box {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            z-index: 1000;
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            font-family: Arial, sans-serif;
+            max-width: 300px;
+        }
+    </style>
 </head>
 <body>
 <div id="map" style="width: 98vw; height: 85vh"></div>
+<div class="info-box">
+    <h3>BetterFileLayer</h3>
+    <p>Click the stacked-layers icon to import spatial data files.</p>
+    <p>Supported formats: Encoded Polylines, CSV, GeoJSON/JSON, GPX, KML, Shapefiles (direct or in ZIP), TopoJSON, WKT.</p>
+    <p>For polygons, area in km² will be displayed in the popup.</p>
+</div>
 </body>
 <script>
   const osm = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {

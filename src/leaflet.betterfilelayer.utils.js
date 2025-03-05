@@ -153,3 +153,75 @@ export function filterProperty(prop) {
 
   return blackList.includes(prop);
 }
+
+/**
+ * Calculate the area of a GeoJSON polygon in square kilometers
+ * Uses the Shoelace formula (Gauss's area formula) for calculating the area of a polygon
+ * 
+ * @param {Object} geometry GeoJSON geometry object
+ * @returns {Number} Area in square kilometers
+ */
+export function calculateAreaInSquareKm(geometry) {
+  // Only calculate area for polygons
+  if (!geometry || (geometry.type !== 'Polygon' && geometry.type !== 'MultiPolygon')) {
+    return 0;
+  }
+
+  let totalArea = 0;
+  
+  // Function to calculate area of a single polygon ring
+  const calculateRingArea = (ring) => {
+    if (ring.length < 3) {
+      return 0;
+    }
+    
+    let area = 0;
+    // Earth radius in kilometers
+    const R = 6371;
+    
+    for (let i = 0; i < ring.length - 1; i++) {
+      const p1 = ring[i];
+      const p2 = ring[i + 1];
+      
+      // Convert to radians
+      const p1Lat = p1[1] * Math.PI / 180;
+      const p1Lng = p1[0] * Math.PI / 180;
+      const p2Lat = p2[1] * Math.PI / 180;
+      const p2Lng = p2[0] * Math.PI / 180;
+      
+      // Calculate area using haversine formula
+      area += (p2Lng - p1Lng) * (2 + Math.sin(p1Lat) + Math.sin(p2Lat));
+    }
+    
+    // Calculate the final area
+    area = Math.abs(area * R * R / 2);
+    return area;
+  };
+  
+  if (geometry.type === 'Polygon') {
+    // Calculate area of outer ring
+    const outerRing = geometry.coordinates[0];
+    totalArea = calculateRingArea(outerRing);
+    
+    // Subtract areas of holes (inner rings)
+    for (let i = 1; i < geometry.coordinates.length; i++) {
+      totalArea -= calculateRingArea(geometry.coordinates[i]);
+    }
+  } else if (geometry.type === 'MultiPolygon') {
+    // Calculate area for each polygon in the multi-polygon
+    for (const polygon of geometry.coordinates) {
+      // Add area of outer ring
+      const outerRing = polygon[0];
+      let polygonArea = calculateRingArea(outerRing);
+      
+      // Subtract areas of holes (inner rings)
+      for (let i = 1; i < polygon.length; i++) {
+        polygonArea -= calculateRingArea(polygon[i]);
+      }
+      
+      totalArea += polygonArea;
+    }
+  }
+  
+  return totalArea;
+}

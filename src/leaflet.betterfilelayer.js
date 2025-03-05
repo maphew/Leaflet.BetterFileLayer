@@ -20,6 +20,7 @@ import {
   filterProperty,
   simpleStyleToLeafletStyle,
   zipShpComponents,
+  calculateAreaInSquareKm,
 } from "./leaflet.betterfilelayer.utils";
 
 L.Control.BetterFileLayer = L.Control.extend({
@@ -174,10 +175,18 @@ L.Control.BetterFileLayer = L.Control.extend({
                   return null;
                 });
 
+              // Calculate area for polygons
+              let areaInfo = "";
+              if (feature.geometry && (feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon')) {
+                const areaInSqKm = calculateAreaInSquareKm(feature.geometry);
+                areaInfo = `<span><b>Area</b> : ${areaInSqKm.toFixed(2)} km²</span>`;
+              }
+
               layer.bindPopup(
                 `
                   <div style="display:flex;flex-direction:column;gap:5px"> 
                       ${rows.join("")}
+                      ${areaInfo}
                   </div>
                 `,
                 {
